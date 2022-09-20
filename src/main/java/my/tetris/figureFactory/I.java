@@ -1,12 +1,12 @@
 package my.tetris.figureFactory;
 
-import my.tetris.Utils.GridCoords;
+import my.tetris.utils.GridCoords;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 class I extends Figure {
+
     public I() {
         initializeColor();
         int shift = new Random().nextInt(numOfFigures);
@@ -18,4 +18,5 @@ class I extends Figure {
         initializeRectangles();
         this.pivot = new GridCoords(2 + shift, 0);
     }
+
 }

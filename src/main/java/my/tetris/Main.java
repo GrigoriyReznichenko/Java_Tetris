@@ -2,7 +2,6 @@ package my.tetris;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import my.tetris.gui.GuiPojo;
 import my.tetris.gui.Gui;
 
 import java.io.IOException;
@@ -10,15 +9,17 @@ import java.io.IOException;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        Gui gui = new Gui();
-        GuiPojo guiPojo = gui.getGuiPojo();
-        Controller controller = new Controller(guiPojo);
+        Gui gui = new Gui(stage);
 
-        stage.setScene(guiPojo.getScene());
-        stage.show();
+        Controller controller = new Controller(gui);
+
+        gui.setController(controller);
+
+        gui.launch();
     }
 
     public static void main(String[] args) {
         launch();
     }
+
 }

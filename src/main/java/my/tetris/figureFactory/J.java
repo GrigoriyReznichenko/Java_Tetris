@@ -1,6 +1,6 @@
 package my.tetris.figureFactory;
 
-import my.tetris.Utils.GridCoords;
+import my.tetris.utils.GridCoords;
 
 import java.util.ArrayList;
 import java.util.Random;

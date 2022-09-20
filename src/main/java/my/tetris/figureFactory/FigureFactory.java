@@ -17,4 +17,5 @@ public class FigureFactory {
             default: throw new RuntimeException("No such figure");
         }
     }
+
 }

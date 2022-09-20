@@ -5,11 +5,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import my.tetris.Controller;
+import my.tetris.utils.GridCoords;
+
+import java.util.List;
 
 public class Gui {
-    private GuiPojo guiPojo;
     private final static int GUI_WIDTH = 455;
     private final static int GUI_HEIGHT = 710;
     private final static int LEFT_PANEL_WIDTH = 100;
@@ -28,40 +31,44 @@ public class Gui {
     private final static int NUM_OF_GRID_ROWS = 20;
     private final static int CELL_SIZE = 35;
 
+    private final Stage stage;
+    private Controller controller;
 
-    public Gui() {
-        AnchorPane root = buildRoot();
-        HBox hBox = buildHBox();
-        VBox vBox = buildVbox();
-        Label score = buildScore();
-        Button resetButton = buildResetButton();
-        AnchorPane rightScene = buildRightScene();
-        GridPane grid = buildGrid();
-        Scene scene = buildScene(root);
+    private final AnchorPane root;
+    private final HBox hBox;
+    private final VBox vBox;
+    private final Label score;
+    private final Button resetButton;
+    private final AnchorPane rightScene;
+    private final GridPane grid;
+    private final Scene scene;
+
+
+    public Gui(Stage stage) {
+        this.stage = stage;
+
+        root = buildRoot();
+        hBox = buildHBox();
+        vBox = buildVbox();
+        score = buildScore();
+        resetButton = buildResetButton();
+        rightScene = buildRightScene();
+        grid = buildGrid();
+        scene = buildScene(root);
 
         root.getChildren().add(hBox);
         hBox.getChildren().addAll(vBox, rightScene);
         vBox.getChildren().addAll(score, resetButton);
         rightScene.getChildren().add(grid);
-
-
-
-        this.guiPojo = new GuiPojo
-                .Builder()
-                .root(root)
-                .hBox(hBox)
-                .vBox(vBox)
-                .score(score)
-                .resetButton(resetButton)
-                .rightScene(rightScene)
-                .grid(grid)
-                .scene(scene)
-                .build();
-
     }
 
-    public GuiPojo getGuiPojo() {
-        return guiPojo;
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
+    public void launch() {
+        stage.setScene(scene);
+        stage.show();
     }
 
     private AnchorPane buildRoot() {
@@ -72,6 +79,7 @@ public class Gui {
         root.setStyle("-fx-background-color: #f2d597;");
         return root;
     }
+
     private HBox buildHBox() {
         HBox hBox = new HBox();
         hBox.setMinSize(GUI_WIDTH, GUI_HEIGHT);
@@ -145,8 +153,36 @@ public class Gui {
 
     }
     private Scene buildScene(AnchorPane root) {
-        Scene scene = new Scene(root, GUI_WIDTH, GUI_HEIGHT);
-        return scene;
+        return new Scene(root, GUI_WIDTH, GUI_HEIGHT);
+    }
+
+
+
+    public void initializeMoving() {
+        scene.setOnKeyPressed(keyEvent -> {
+            switch (keyEvent.getCode()) {
+                case E:
+                    controller.processRotateLeft();
+                    break;
+                case Q:
+                    List<GridCoords> coordsRotatedToLeft = getRotatedFigureCoords(Math.toRadians(-90));
+                    rotateFigure(coordsRotatedToLeft);
+                    break;
+                case D:
+                    GridCoords rightSideIncrement = new GridCoords(1, 0);
+                    moveFigureToSide(rightSideIncrement);
+                    break;
+                case A:
+                    GridCoords leftSideIncrement = new GridCoords(-1, 0);
+                    moveFigureToSide(leftSideIncrement);
+                    break;
+                case S:
+                    moveFigureToTheBottom();
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
 }
