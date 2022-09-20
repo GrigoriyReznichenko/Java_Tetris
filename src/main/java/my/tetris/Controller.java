@@ -28,13 +28,13 @@ public class Controller {
 
     public Controller(Gui gui) {
         this.gui = gui;
-        initializeFigure();
-        initializeMoving();
+        initialize();
     }
 
-    private void initializeMoving() {
-        gui.initializeMoving();
+    private void initialize() {
+        initializeFigure();
         gui.initializeTimeline();
+        gui.initializeMoving();
     }
 
     public void processRotateLeft() {
@@ -45,9 +45,9 @@ public class Controller {
     }
 
     public void processRotateRight() {
-        List<GridCoords> coordsRotatedLeft = getRotatedFigureCoords(Math.toRadians(-90));
-        if (moveOrRotationAreAllowed(coordsRotatedLeft)) {
-            drawFigure(coordsRotatedLeft);
+        List<GridCoords> coordsRotatedRight = getRotatedFigureCoords(Math.toRadians(-90));
+        if (moveOrRotationAreAllowed(coordsRotatedRight)) {
+            drawFigure(coordsRotatedRight);
         }
     }
 
@@ -226,7 +226,7 @@ public class Controller {
     }
 
 
-    private void initializeFigure() {
+    public void initializeFigure() {
         FigureFactory figureFactory = new FigureFactory();
         Figure figure = figureFactory.generateFigure();
         this.pivot = figure.getPivot();
