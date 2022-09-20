@@ -24,10 +24,12 @@ public class Controller {
     private final Gui gui;
 
     private GridCoords pivot;
+    private final FigureFactory figureFactory;
 
 
-    public Controller(Gui gui) {
+    public Controller(Gui gui, FigureFactory figureFactory) {
         this.gui = gui;
+        this.figureFactory = figureFactory;
         initialize();
     }
 
@@ -227,7 +229,6 @@ public class Controller {
 
 
     public void initializeFigure() {
-        FigureFactory figureFactory = new FigureFactory();
         Figure figure = figureFactory.generateFigure();
         this.pivot = figure.getPivot();
 
