@@ -15,6 +15,6 @@ class T extends Figure {
         figureCoords.add(new GridCoords(2 + shift, 0));
         figureCoords.add(new GridCoords(1 + shift, 1));
         initializeRectangles();
-        this.pivot = new GridCoords(1 + shift, 1);
+        this.pivot = new GridCoords(1 + shift, 0);
     }
 }

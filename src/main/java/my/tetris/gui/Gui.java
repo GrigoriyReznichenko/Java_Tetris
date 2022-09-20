@@ -1,5 +1,8 @@
 package my.tetris.gui;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -7,10 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import my.tetris.Controller;
-import my.tetris.utils.GridCoords;
-
-import java.util.List;
 
 public class Gui {
     private final static int GUI_WIDTH = 455;
@@ -32,44 +33,79 @@ public class Gui {
     private final static int CELL_SIZE = 35;
 
     private final Stage stage;
-    private Controller controller;
-
     private final AnchorPane root;
-    private final HBox hBox;
-    private final VBox vBox;
+    private final HBox panelAndRightSceneContainer;
+    private final VBox buttonScoreContainer;
     private final Label score;
     private final Button resetButton;
     private final AnchorPane rightScene;
     private final GridPane grid;
     private final Scene scene;
 
+    private Controller controller;
+
 
     public Gui(Stage stage) {
         this.stage = stage;
+        this.root = buildRoot();
+        this.scene = buildScene(root);
 
-        root = buildRoot();
-        hBox = buildHBox();
-        vBox = buildVbox();
-        score = buildScore();
-        resetButton = buildResetButton();
-        rightScene = buildRightScene();
-        grid = buildGrid();
-        scene = buildScene(root);
+        this.panelAndRightSceneContainer = buildPanelAndRightSceneContainer();
+        this.buttonScoreContainer = buildButtonScoreContainer();
+        this.score = buildScore();
+        this.resetButton = buildResetButton();
+        this.rightScene = buildRightScene();
+        this.grid = buildGrid();
 
-        root.getChildren().add(hBox);
-        hBox.getChildren().addAll(vBox, rightScene);
-        vBox.getChildren().addAll(score, resetButton);
+        root.getChildren().add(panelAndRightSceneContainer);
+        panelAndRightSceneContainer.getChildren().addAll(buttonScoreContainer, rightScene);
+        buttonScoreContainer.getChildren().addAll(score, resetButton);
         rightScene.getChildren().add(grid);
-    }
-
-    public void setController(Controller controller) {
-        this.controller = controller;
     }
 
     public void launch() {
         stage.setScene(scene);
         stage.show();
     }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
+    public void initializeTimeline() {
+        KeyFrame keyFrame = new KeyFrame(Duration.millis(500), actionEvent -> {
+            controller.processMoveDown();
+            controller.updateScoreIfNeeded();
+        });
+        Timeline timeline = new Timeline(keyFrame);
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
+
+    public void initializeMoving() {
+        scene.setOnKeyPressed(keyEvent -> {
+            switch (keyEvent.getCode()) {
+                case E:
+                    controller.processRotateLeft();
+                    break;
+                case Q:
+                    controller.processRotateRight();
+                    break;
+                case A:
+                    controller.processMoveLeft();
+                    break;
+                case D:
+                    controller.processMoveRight();
+                    break;
+                case S:
+                    controller.processMoveToBottom();
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
 
     private AnchorPane buildRoot() {
         AnchorPane root = new AnchorPane();
@@ -80,14 +116,15 @@ public class Gui {
         return root;
     }
 
-    private HBox buildHBox() {
+    private HBox buildPanelAndRightSceneContainer() {
         HBox hBox = new HBox();
         hBox.setMinSize(GUI_WIDTH, GUI_HEIGHT);
         hBox.setMaxSize(GUI_WIDTH, GUI_HEIGHT);
         hBox.setPrefSize(GUI_WIDTH, GUI_HEIGHT);
         return hBox;
     }
-    private VBox buildVbox() {
+
+    private VBox buildButtonScoreContainer() {
         VBox vBox = new VBox();
         vBox.setMinSize(LEFT_PANEL_WIDTH, LEFT_PANEL_HEIGHT);
         vBox.setMaxSize(LEFT_PANEL_WIDTH, LEFT_PANEL_HEIGHT);
@@ -96,6 +133,7 @@ public class Gui {
         vBox.setSpacing(VBOX_SPACING);
         return vBox;
     }
+
     private Label buildScore() {
         Label scoreLabel = new Label();
         scoreLabel.setMinSize(SCORE_WIDTH, SCORE_HEIGHT);
@@ -105,8 +143,11 @@ public class Gui {
         scoreLabel.setAlignment(Pos.CENTER);
         scoreLabel.setFont(Font.font(FONT_SIZE));
         scoreLabel.setText("Score: " + 0);
+        scoreLabel.setOnMouseClicked(mouseEvent -> controller.resetGame());
+
         return scoreLabel;
     }
+
     private Button buildResetButton() {
         Button resetButton = new Button();
         resetButton.setMinSize(RESET_BUTTON_WIDTH, RESET_BUTTON_HEIGHT);
@@ -118,6 +159,7 @@ public class Gui {
         resetButton.setText("Reset");
         return resetButton;
     }
+
     private AnchorPane buildRightScene() {
         AnchorPane rightScene = new AnchorPane();
         rightScene.setMinSize(RIGHT_SCENE_WIDTH, RIGHT_SCENE_HEIGHT);
@@ -126,6 +168,7 @@ public class Gui {
         rightScene.setStyle("-fx-border-color: #000000;\n");
         return rightScene;
     }
+
     private GridPane buildGrid() {
         GridPane grid = new GridPane();
         grid.setMinSize(GRID_WIDTH, GRID_HEIGHT);
@@ -152,37 +195,18 @@ public class Gui {
         return grid;
 
     }
+
     private Scene buildScene(AnchorPane root) {
         return new Scene(root, GUI_WIDTH, GUI_HEIGHT);
     }
 
 
+    public Label getScore() {
+        return score;
+    }
 
-    public void initializeMoving() {
-        scene.setOnKeyPressed(keyEvent -> {
-            switch (keyEvent.getCode()) {
-                case E:
-                    controller.processRotateLeft();
-                    break;
-                case Q:
-                    List<GridCoords> coordsRotatedToLeft = getRotatedFigureCoords(Math.toRadians(-90));
-                    rotateFigure(coordsRotatedToLeft);
-                    break;
-                case D:
-                    GridCoords rightSideIncrement = new GridCoords(1, 0);
-                    moveFigureToSide(rightSideIncrement);
-                    break;
-                case A:
-                    GridCoords leftSideIncrement = new GridCoords(-1, 0);
-                    moveFigureToSide(leftSideIncrement);
-                    break;
-                case S:
-                    moveFigureToTheBottom();
-                    break;
-                default:
-                    break;
-            }
-        });
+    public GridPane getGrid() {
+        return grid;
     }
 
 }
