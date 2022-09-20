@@ -5,35 +5,59 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.LinearGradient;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-import my.tetris.Utils.GridCoords;
-import my.tetris.Utils.IDs;
 import my.tetris.figureFactory.Figure;
 import my.tetris.figureFactory.FigureFactory;
-import my.tetris.gui.GuiPojo;
+import my.tetris.gui.Gui;
+import my.tetris.utils.FigureStatus;
+import my.tetris.utils.GridCoords;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Controller {
-    private GuiPojo guiPojo;
-    private GridCoords pivot;
-    private LinearGradient figureColor;
     private static final int NUM_OF_GRID_ROWS = 20;
     private static final int NUM_OF_GRID_COLUMNS = 10;
 
-    public Controller(GuiPojo guiPojo) {
-        this.guiPojo = guiPojo;
+    private final Gui gui;
+
+    private GridCoords pivot;
+
+
+    public Controller(Gui gui) {
+        this.gui = gui;
+
         initializeFigure();
         initializeTimeline();
         initializeMoving();
         initializeReset();
     }
+
+
+    private void initializeFigure() {
+        FigureFactory figureFactory = new FigureFactory();
+
+        Figure figure = figureFactory.generateFigure();
+
+        this.pivot = figure.getPivot();
+
+        List<GridCoords> figureCoords = figure.getFigureCoords();
+        List<Rectangle> figureRectangles = figure.getFigureRectangles();
+        for (int i = 0; i < figureCoords.size(); i++) {
+            int xCoord = figureCoords.get(i).getXCoord();
+            int yCoord = figureCoords.get(i).getYCoord();
+            Rectangle rectangle = figureRectangles.get(i);
+            rectangle.setId(FigureStatus.FALLING.getId());
+            gui.getGrid().add(rectangle, xCoord, yCoord);
+        }
+    }
+
     private void initializeTimeline() {
-        KeyFrame keyFrame = new KeyFrame(Duration.millis(200), actionEvent -> {
+        KeyFrame keyFrame = new KeyFrame(Duration.millis(500), actionEvent -> {
             GridCoords increment = new GridCoords(0, 1);
             moveFigureDown(increment);
             updateScore();
@@ -42,76 +66,38 @@ public class Controller {
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }
-    private void initializeFigure() {
-        FigureFactory figureFactory = new FigureFactory();
-        Figure figure = figureFactory.generateFigure();
-        this.pivot = figure.getPivot();
-        this.figureColor = figure.getFigureColor();
 
-        List<GridCoords> figureCoords = figure.getFigureCoords();
-        List<Rectangle> figureRectangles = figure.getFigureRectangles();
-        for (int i = 0; i < figureCoords.size(); i++) {
-            int xCoord = figureCoords.get(i).getXCoord();
-            int yCoord = figureCoords.get(i).getYCoord();
-            Rectangle rectangle = figureRectangles.get(i);
-            rectangle.setId(IDs.FALLING.getCode());
-            guiPojo.getGrid().add(rectangle, xCoord, yCoord);
-        }
-
-    }
     private void initializeMoving() {
-        guiPojo.getScene().setOnKeyPressed(keyEvent -> {
-            switch (keyEvent.getCode()) {
-                case E:
-                    List<GridCoords> coordsRotatedToRight = getRotatedFigureCoords(Math.toRadians(90));
-                    rotateFigure(coordsRotatedToRight);
-                    break;
-                case Q:
-                    List<GridCoords> coordsRotatedToLeft = getRotatedFigureCoords(Math.toRadians(-90));
-                    rotateFigure(coordsRotatedToLeft);
-                    break;
-                case D:
-                    GridCoords rightSideIncrement = new GridCoords(1, 0);
-                    moveFigureToSide(rightSideIncrement);
-                    break;
-                case A:
-                    GridCoords leftSideIncrement = new GridCoords(-1, 0);
-                    moveFigureToSide(leftSideIncrement);
-                    break;
-                case S:
-                    moveFigureToTheBottom();
-                    break;
-                default:
-                    break;
-            }
-        });
+        gui.initializeMoving();
     }
+
     private void initializeReset() {
-        guiPojo.getResetButton().setOnMouseClicked(mouseEvent -> {
+        gui.getResetButton().setOnMouseClicked(mouseEvent -> {
             List<Rectangle> fallingFigure = getFallingFigure();
             List<Rectangle> bottomFigures = getBottomFigures();
-            guiPojo.getGrid().getChildren().removeAll(fallingFigure);
-            guiPojo.getGrid().getChildren().removeAll(bottomFigures);
-            guiPojo.getScore().setText("Score: " + 0);
+            gui.getGrid().getChildren().removeAll(fallingFigure);
+            gui.getGrid().getChildren().removeAll(bottomFigures);
+            gui.getScore().setText("Score: " + 0);
             initializeFigure();
         });
     }
 
+
     private List<Rectangle> getFallingFigure() {
-        return guiPojo
+        return gui
                 .getGrid()
                 .getChildren()
                 .stream()
-                .filter(node -> Objects.equals(node.getId(), IDs.FALLING.getCode()))
+                .filter(node -> Objects.equals(node.getId(), FigureStatus.FALLING.getId()))
                 .map(node -> (Rectangle) node)
                 .collect(Collectors.toList());
     }
     private List<Rectangle> getBottomFigures() {
-        return guiPojo
+        return gui
                 .getGrid()
                 .getChildren()
                 .stream()
-                .filter(node -> Objects.equals(node.getId(), IDs.BOTTOM.getCode()))
+                .filter(node -> Objects.equals(node.getId(), FigureStatus.BOTTOM.getId()))
                 .map(node -> (Rectangle) node)
                 .collect(Collectors.toList());
     }
@@ -245,16 +231,16 @@ public class Controller {
     }
     private void drawFigure(List<GridCoords> newFigureCoords) {
         List<Rectangle> fallingFigure = getFallingFigure();
-        guiPojo.getGrid().getChildren().removeAll(fallingFigure);
+        gui.getGrid().getChildren().removeAll(fallingFigure);
         for (int i = 0; i < fallingFigure.size(); i++) {
             int xCoord = newFigureCoords.get(i).getXCoord();
             int yCoord = newFigureCoords.get(i).getYCoord();
             Rectangle currentRectangle = fallingFigure.get(i);
-            guiPojo.getGrid().add(currentRectangle, xCoord, yCoord);
+            gui.getGrid().add(currentRectangle, xCoord, yCoord);
         }
     }
     private void moveRectanglesDown(List<Rectangle> rectangles) {
-        for(Rectangle currentRectangle : rectangles) {
+        for (Rectangle currentRectangle : rectangles) {
             Rectangle copy = new Rectangle();
             copy.setWidth(currentRectangle.getWidth());
             copy.setHeight(currentRectangle.getHeight());
@@ -263,17 +249,17 @@ public class Controller {
             copy.setStroke(Color.BLACK);
             copy.setFill(currentRectangle.getFill());
             copy.setStrokeWidth(currentRectangle.getStrokeWidth());
-            copy.setId(IDs.BOTTOM.getCode());
+            copy.setId(FigureStatus.BOTTOM.getId());
 
             int xCoord = GridPane.getColumnIndex(currentRectangle);
             int yCoord = GridPane.getRowIndex(currentRectangle) + 1;
-            guiPojo.getGrid().getChildren().remove(currentRectangle);
-            guiPojo.getGrid().add(copy, xCoord, yCoord);
+            gui.getGrid().getChildren().remove(currentRectangle);
+            gui.getGrid().add(copy, xCoord, yCoord);
         }
     }
     private void setAllFallingIDToBottomID() {
         List<Rectangle> fallinFigures = getFallingFigure();
-        fallinFigures.forEach(rectangle -> rectangle.setId(IDs.BOTTOM.getCode()));
+        fallinFigures.forEach(rectangle -> rectangle.setId(FigureStatus.BOTTOM.getId()));
     }
     private void updateScore() {
         List<List<GridCoords>> allHorizontalLines = getHorizontalLines();
@@ -282,11 +268,11 @@ public class Controller {
             if(rectanglesFormALine(lineCoord)) {
                 List<Rectangle> rectanglesFormLine = getRectanglesAtCoords(lineCoord);
                 List<Rectangle> rectanglesUpperLine = getRectanglesUpperBound(yCoord);
-                guiPojo.getGrid().getChildren().removeAll(rectanglesFormLine);
+                gui.getGrid().getChildren().removeAll(rectanglesFormLine);
                 moveRectanglesDown(rectanglesUpperLine);
                 yCoord++;
-                int currentScore = Integer.parseInt(guiPojo.getScore().getText().split(" ")[1]) + 10;
-                guiPojo.getScore().setText("Score: " + currentScore);
+                int currentScore = Integer.parseInt(gui.getScore().getText().split(" ")[1]) + 10;
+                gui.getScore().setText("Score: " + currentScore);
             }
         }
     }
@@ -343,6 +329,13 @@ public class Controller {
             if (crossingDetected) countIntersections++;
         }
         return countIntersections == 10;
+    }
+
+
+
+    public void processRotateLeft() {
+        List<GridCoords> coordsRotatedToRight = getRotatedFigureCoords(Math.toRadians(90));
+        rotateFigure(coordsRotatedToRight);
     }
 
 }

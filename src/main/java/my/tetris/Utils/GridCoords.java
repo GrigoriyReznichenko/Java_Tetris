@@ -1,6 +1,4 @@
-package my.tetris.Utils;
-
-import javafx.scene.Node;
+package my.tetris.utils;
 
 public class GridCoords {
     private final int xCoord;
