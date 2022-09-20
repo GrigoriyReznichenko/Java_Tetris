@@ -5,7 +5,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import my.tetris.figureFactory.Figure;
 import my.tetris.figureFactory.FigureFactory;
-import my.tetris.gui.Gui;
 import my.tetris.utils.FigureStatus;
 import my.tetris.utils.GridCoords;
 

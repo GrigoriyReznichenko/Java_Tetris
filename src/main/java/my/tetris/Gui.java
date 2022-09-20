@@ -1,4 +1,4 @@
-package my.tetris.gui;
+package my.tetris;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -11,7 +11,6 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import my.tetris.Controller;
 
 public class Gui {
     private final static int GUI_WIDTH = 455;
