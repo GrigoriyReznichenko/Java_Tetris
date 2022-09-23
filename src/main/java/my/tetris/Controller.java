@@ -72,7 +72,7 @@ public class Controller {
         } else {
             setAllFallingIDToBottomID();
             if (isGameOver()) {
-                resetGame();
+                restartGame();
             } else {
                 initializeFigure();
             }
@@ -92,7 +92,7 @@ public class Controller {
             } else {
                 setAllFallingIDToBottomID();
                 if (isGameOver()) {
-                    resetGame();
+                    restartGame();
                 } else {
                     initializeFigure();
                 }
@@ -118,7 +118,7 @@ public class Controller {
         }
     }
 
-    public void resetGame() {
+    public void restartGame() {
         List<Rectangle> fallingFigure = getFallingFigure();
         List<Rectangle> bottomFigures = getBottomFigures();
         gui.getGrid().getChildren().removeAll(fallingFigure);

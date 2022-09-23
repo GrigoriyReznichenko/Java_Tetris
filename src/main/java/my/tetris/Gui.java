@@ -20,12 +20,12 @@ public class Gui {
     private final static int VBOX_SPACING = 610;
     private final static int SCORE_WIDTH = 90;
     private final static int SCORE_HEIGHT = 40;
-    private final static int RESET_BUTTON_WIDTH = SCORE_WIDTH;
-    private final static int RESET_BUTTON_HEIGHT = SCORE_HEIGHT;
+    private final static int RESTART_BUTTON_WIDTH = SCORE_WIDTH;
+    private final static int RESTART_BUTTON_HEIGHT = SCORE_HEIGHT;
     private final static int RIGHT_SCENE_WIDTH = 350;
     private final static int RIGHT_SCENE_HEIGHT = 708;
     private final static int GRID_WIDTH = RIGHT_SCENE_WIDTH;
-    private final static int GRID_HEIGHT = RESET_BUTTON_HEIGHT;
+    private final static int GRID_HEIGHT = RESTART_BUTTON_HEIGHT;
     private final static int FONT_SIZE = 16;
     private final static int NUM_OF_GRID_COLUMNS = 10;
     private final static int NUM_OF_GRID_ROWS = 20;
@@ -36,7 +36,7 @@ public class Gui {
     private final HBox panelAndRightSceneContainer;
     private final VBox buttonScoreContainer;
     private final Label score;
-    private final Button resetButton;
+    private final Button restartButton;
     private final AnchorPane rightScene;
     private final GridPane grid;
     private final Scene scene;
@@ -52,7 +52,7 @@ public class Gui {
         this.panelAndRightSceneContainer = buildPanelAndRightSceneContainer();
         this.buttonScoreContainer = buildButtonScoreContainer();
         this.score = buildScore();
-        this.resetButton = buildResetButton();
+        this.restartButton = buildRestartButton();
         this.rightScene = buildRightScene();
         this.grid = buildGrid();
 
@@ -60,7 +60,7 @@ public class Gui {
         panelAndRightSceneContainer.getChildren().add(buttonScoreContainer);
         panelAndRightSceneContainer.getChildren().add(rightScene);
         buttonScoreContainer.getChildren().add(score);
-        buttonScoreContainer.getChildren().add(resetButton);
+        buttonScoreContainer.getChildren().add(restartButton);
         rightScene.getChildren().add(grid);
     }
 
@@ -148,18 +148,19 @@ public class Gui {
         return scoreLabel;
     }
 
-    private Button buildResetButton() {
-        Button resetButton = new Button();
-        resetButton.setMinSize(RESET_BUTTON_WIDTH, RESET_BUTTON_HEIGHT);
-        resetButton.setMaxSize(RESET_BUTTON_WIDTH, RESET_BUTTON_HEIGHT);
-        resetButton.setPrefSize(RESET_BUTTON_WIDTH, RESET_BUTTON_HEIGHT);
+    private Button buildRestartButton() {
+        Button restartButton = new Button();
+        restartButton.setMinSize(RESTART_BUTTON_WIDTH, RESTART_BUTTON_HEIGHT);
+        restartButton.setMaxSize(RESTART_BUTTON_WIDTH, RESTART_BUTTON_HEIGHT);
+        restartButton.setPrefSize(RESTART_BUTTON_WIDTH, RESTART_BUTTON_HEIGHT);
 
-        resetButton.setAlignment(Pos.CENTER);
-        resetButton.setFont(Font.font(FONT_SIZE));
-        resetButton.setText("Reset");
+        restartButton.setAlignment(Pos.CENTER);
+        restartButton.setFont(Font.font(FONT_SIZE));
+        restartButton.setText("Restart");
 
-        resetButton.setOnMouseClicked(mouseEvent -> controller.resetGame());
-        return resetButton;
+        restartButton.setOnMouseClicked(mouseEvent -> controller.restartGame());
+
+        return restartButton;
     }
 
     private AnchorPane buildRightScene() {
