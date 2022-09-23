@@ -8,9 +8,8 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         Gui gui = new Gui(stage);
-        FigureFactory figureFactory = new FigureFactory();
 
-        Controller controller = new Controller(gui, figureFactory);
+        Controller controller = new Controller(gui);
 
         gui.setController(controller);
 

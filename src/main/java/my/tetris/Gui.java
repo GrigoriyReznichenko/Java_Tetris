@@ -57,8 +57,10 @@ public class Gui {
         this.grid = buildGrid();
 
         root.getChildren().add(panelAndRightSceneContainer);
-        panelAndRightSceneContainer.getChildren().addAll(buttonScoreContainer, rightScene);
-        buttonScoreContainer.getChildren().addAll(score, resetButton);
+        panelAndRightSceneContainer.getChildren().add(buttonScoreContainer);
+        panelAndRightSceneContainer.getChildren().add(rightScene);
+        buttonScoreContainer.getChildren().add(score);
+        buttonScoreContainer.getChildren().add(resetButton);
         rightScene.getChildren().add(grid);
     }
 
@@ -142,7 +144,6 @@ public class Gui {
         scoreLabel.setAlignment(Pos.CENTER);
         scoreLabel.setFont(Font.font(FONT_SIZE));
         scoreLabel.setText("Score: " + 0);
-        scoreLabel.setOnMouseClicked(mouseEvent -> controller.resetGame());
 
         return scoreLabel;
     }
@@ -156,6 +157,8 @@ public class Gui {
         resetButton.setAlignment(Pos.CENTER);
         resetButton.setFont(Font.font(FONT_SIZE));
         resetButton.setText("Reset");
+
+        resetButton.setOnMouseClicked(mouseEvent -> controller.resetGame());
         return resetButton;
     }
 

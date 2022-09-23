@@ -27,9 +27,9 @@ public class Controller {
     private final FigureFactory figureFactory;
 
 
-    public Controller(Gui gui, FigureFactory figureFactory) {
+    public Controller(Gui gui) {
         this.gui = gui;
-        this.figureFactory = figureFactory;
+        this.figureFactory = new FigureFactory();
         initialize();
     }
 
@@ -71,7 +71,11 @@ public class Controller {
             pivot = new GridCoords(xCoord, yCoord);
         } else {
             setAllFallingIDToBottomID();
-            initializeFigure();
+            if (isGameOver()) {
+                resetGame();
+            } else {
+                initializeFigure();
+            }
         }
     }
 
@@ -87,7 +91,11 @@ public class Controller {
                 pivot = new GridCoords(xCoord, yCoord);
             } else {
                 setAllFallingIDToBottomID();
-                initializeFigure();
+                if (isGameOver()) {
+                    resetGame();
+                } else {
+                    initializeFigure();
+                }
                 break;
             }
 
@@ -348,6 +356,13 @@ public class Controller {
         return countIntersections == 10;
     }
 
-
-
+    private boolean isGameOver() {
+        List<GridCoords> bottomFigureCoords = getBottomFiguresCoords();
+        for(GridCoords currentCoords : bottomFigureCoords) {
+            if (currentCoords.getYCoord() == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
